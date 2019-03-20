@@ -7,10 +7,10 @@ from PIL import Image
 def wrapper_cut_picture(output_size):
     def cut_picture(path):
         (filepath, tempfilename) = os.path.split(path)
-        (filename, extension) = os.path.splitext(tempfilename)
-
-        current_path = os.path.dirname(path)
         print(filepath)
+
+        (filename, extension) = os.path.splitext(tempfilename)
+        current_path = os.path.dirname(path)
 
         img = Image.open(path)
         width = img.size[0]
@@ -58,7 +58,7 @@ def load_data(path):
         output_dir = './dataset'
         output_size = 224
         try:
-            shutil.copytree(input_dir, output_dor)
+            shutil.copytree(input_dir, output_dir)
         except FileExistsError:
             print('file exists')
 
@@ -87,12 +87,18 @@ test_dir = os.path.join(base_dir, 'test')
 mkdir_if_not_exists(test_dir)
 
 train_first_scan_dir = os.path.join(train_dir, 'first-scan')
+mkdir_if_not_exists(train_first_scan_dir)
 validation_first_scan_dir = os.path.join(validation_dir, 'first-scan')
+mkdir_if_not_exists(validation_first_scan_dir)
 test_first_scan_dir = os.path.join(test_dir, 'first-scan')
+mkdir_if_not_exists(test_first_scan_dir)
 
 train_second_scan_dir = os.path.join(train_dir, 'second-scan')
+mkdir_if_not_exists(train_second_scan_dir)
 validation_second_scan_dir = os.path.join(validation_dir, 'second-scan')
+mkdir_if_not_exists(validation_second_scan_dir)
 test_second_scan_dir = os.path.join(test_dir, 'second-scan')
+mkdir_if_not_exists(test_second_scan_dir)
 
 # 将 first-scan 的图片随机复制到 train, validation, test 的文件夹中
 # 数据集万级别，按比例 6 ： 2 ： 2 划分
@@ -103,21 +109,21 @@ second_scan_dataset_dir = os.path.join(dataset_dir, 'second-scan')
 def first_scan_to_target(path):
     flag = random.randint(0, 9)
     if flag >= 0 and flag <= 5:
-        shutil.copyfile(path, train_first_scan_dir)
-    else if flag >= 6 and flag <= 7:
-        shutil.copyfile(path, validation_first_scan_dir)
+        shutil.copy(path, train_first_scan_dir)
+    elif flag >= 6 and flag <= 7:
+        shutil.copy(path, validation_first_scan_dir)
     else:
-        shutil.copyfile(path, test_first_scan_dir)
+        shutil.copy(path, test_first_scan_dir)
 
 
 def second_scan_to_target(path):
     flag = random.randint(0, 9)
     if flag >= 0 and flag <= 5:
-        shutil.copyfile(path, train_second_scan_dir)
-    else if flag >= 6 and flag <= 7:
-        shutil.copyfile(path, validation_second_scan_dir)
+        shutil.copy(path, train_second_scan_dir)
+    elif flag >= 6 and flag <= 7:
+        shutil.copy(path, validation_second_scan_dir)
     else:
-        shutil.copyfile(path, test_second_scan_dir)
+        shutil.copy(path, test_second_scan_dir)
 
 
 walk(first_scan_dataset_dir, first_scan_to_target)
