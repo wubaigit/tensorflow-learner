@@ -2,6 +2,8 @@ import os
 import shutil
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = 1000000000
+
 def mkdir_if_not_exists(dirname):
     if not os.path.exists(dirname):
         os.mkdir(dirname)
