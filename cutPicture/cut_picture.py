@@ -2,6 +2,7 @@ import os
 import shutil
 from PIL import Image
 
+
 def cut_picture(path, output_size):
     (filepath, tempfilename) = os.path.split(path)
     (filename, extension) = os.path.splitext(tempfilename)
@@ -27,11 +28,13 @@ def cut_picture(path, output_size):
             right = x_position + output_size
             bottom = y_position + output_size
             output_img = img.crop((left, top, right, bottom))
-            output_img.save(os.path.join(current_path, './%s-%s.%s'% (filename, i, extension)))
+            output_img.save(os.path.join(
+                current_path, './%s-%s.%s' % (filename, i, extension)))
             x_position += output_size
             i += 1
         y_position += output_size
     os.remove(path)
+
 
 def walk(output_dir, output_size):
     for lists in os.listdir(output_dir):
