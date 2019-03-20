@@ -12,7 +12,7 @@ def wrapper_cut_picture(output_size, output_dir):
     def cut_picture(path):
         (_, tempfilename) = os.path.split(path)
         (filename, extension) = os.path.splitext(tempfilename)
-        print(path)
+        print('input:', path)
 
         img = Image.open(path)
         width = img.size[0]
@@ -32,7 +32,9 @@ def wrapper_cut_picture(output_size, output_dir):
                 right = x_position + output_size
                 bottom = y_position + output_size
                 output_img = img.crop((left, top, right, bottom))
-                output_img.save(os.path.join(output_dir, '%s-%s%s'%(filename, i, extension)))
+                output_img_name = os.path.join(output_dir, '%s-%s%s'%(filename, i, extension))
+                print('output:', output_img_name)
+                output_img.save(output_img_name)
                 x_position += output_size
                 i += 1
             y_position += output_size
@@ -71,4 +73,4 @@ def load_data(output_size):
 
 
 load_data(224)
-    
+load_data(299)
