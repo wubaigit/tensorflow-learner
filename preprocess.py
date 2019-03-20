@@ -12,7 +12,7 @@ def wrapper_cut_picture(output_size, output_dir):
     def cut_picture(path):
         (_, tempfilename) = os.path.split(path)
         (filename, extension) = os.path.splitext(tempfilename)
-        print(filename)
+        print(path)
 
         img = Image.open(path)
         width = img.size[0]
