@@ -31,7 +31,7 @@ def wrapper_cut_picture(output_size):
                 bottom = y_position + output_size
                 output_img = img.crop((left, top, right, bottom))
                 output_img.save(os.path.join(
-                    current_path, './%s-%s.%s' % (filename, i, extension)))
+                    current_path, './%s-%s%s' % (filename, i, extension)))
                 x_position += output_size
                 i += 1
             y_position += output_size
@@ -51,19 +51,18 @@ def walk(root_dir, callback):
 
 
 def load_data(path):
-    if (os.path.exists(path)):
-        return
-    else:
-        input_dir = './sample'
-        output_dir = './dataset'
-        output_size = 224
+    output_size = 224
+    input_dir = './sample'
+    output_dir = './dataset'
+
+    if not os.path.exists(path):
         try:
             shutil.copytree(input_dir, output_dir)
         except FileExistsError:
             print('file exists')
 
-        callback = wrapper_cut_picture(output_size)
-        walk(output_dir, callback)
+    callback = wrapper_cut_picture(output_size)
+    walk(output_dir, callback)
 
 
 current_path = os.path.dirname(__file__)
@@ -126,8 +125,8 @@ def second_scan_to_target(path):
         shutil.copy(path, test_second_scan_dir)
 
 
-walk(first_scan_dataset_dir, first_scan_to_target)
-walk(second_scan_dataset_dir, second_scan_to_target)
+# walk(first_scan_dataset_dir, first_scan_to_target)
+# walk(second_scan_dataset_dir, second_scan_to_target)
 
 
 def print_num_of_dataset():
