@@ -67,7 +67,8 @@ def load_data(output_size):
         return (first_scan_base, second_scan_base)    
 
     (first_scan_base, second_scan_base) = sample(str(output_size))
-
+    if len(os.listdir(first_scan_base)) != 0 and len(os.listdir(second_scan_base)) != 0:
+        return
     walk(first_scan_sample, wrapper_cut_picture(output_size, first_scan_base))
     walk(second_scan_sample, wrapper_cut_picture(output_size, second_scan_base))
 
