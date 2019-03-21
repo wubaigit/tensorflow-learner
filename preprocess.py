@@ -32,7 +32,7 @@ def wrapper_cut_picture(output_size, output_dir):
                 right = x_position + output_size
                 bottom = y_position + output_size
                 output_img = img.crop((left, top, right, bottom))
-                output_img_name = os.path.join(output_dir, '%s-%s%s'%(filename, i, extension))
+                output_img_name = os.path.join(output_dir, '%s_%s%s'%(filename, i, extension))
                 print('output:', output_img_name)
                 output_img.save(output_img_name)
                 x_position += output_size
@@ -56,6 +56,8 @@ def load_data(output_size):
     second_scan_sample = os.path.join(sample_dir, 'second-scan')
 
     base_dir = os.path.join(current_path, 'base')
+    if os.path.exists(base_dir):
+        return
     mkdir_if_not_exists(base_dir)
     def sample(sample_size):
         sample_size_dir = os.path.join(base_dir, sample_size)
@@ -74,3 +76,17 @@ def load_data(output_size):
 
 load_data(224)
 load_data(299)
+
+first_scan_224 = './base/224/first-scan'
+second_scan_224 = './base/224/second-scan'
+first_scan_299 = './base/299/first-scan'
+second_scan_299 = './base/299/second-scan'
+
+
+def print_len_listdir(dirname):
+    print(len(os.listdir(dirname)))
+
+print_len_listdir(first_scan_224)   # 87168
+print_len_listdir(second_scan_224)  # 436150
+print_len_listdir(first_scan_299)   # 48444
+print_len_listdir(second_scan_299)  # 242450
