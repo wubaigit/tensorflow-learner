@@ -2,19 +2,36 @@ import os
 import shutil
 from PIL import Image
 
+import random
+
 Image.MAX_IMAGE_PIXELS = 1000000000
 
+"""
+阶段一：遍历原数据 sample 文件夹下的文件，将文件裁剪并放到 base 对应的文件夹下 => load_data
+阶段二：将 base 文件夹下的数据进行过采样 => oversampling
+阶段三：将数据分成 train, validation, test 三类 => divide_to_train_validation_test
+"""
 
-def mkdir_if_not_exists(dirname):
-    if not os.path.exists(dirname):
-        os.mkdir(dirname)
+
+def os_path_join(father_dir, filename):
+    new_file = os.path.join(father_dir, filename)
+    if not os.path.exists(new_file):
+        os.mkdir(new_file)
+    return new_file
 
 
-def wrapper_cut_picture(output_size, output_dir):
+def walk(path, callback):
+    for fpath, _, file_list in os.walk(path):
+        for file_name in file_list:
+            path = os.path.join(fpath, file_name)
+            callback(path)
+
+
+def curry_cut_picture(output_image_size, output_dir):
     def cut_picture(path):
+        print('input:', path)
         (_, tempfilename) = os.path.split(path)
         (filename, extension) = os.path.splitext(tempfilename)
-        print('input:', path)
 
         img = Image.open(path)
         width = img.size[0]
@@ -23,49 +40,45 @@ def wrapper_cut_picture(output_size, output_dir):
         y_position = 0
         i = 0
         while True:
-            if y_position + output_size > height:
+            if y_position + output_image_size > height:
                 break
             x_position = 0
             while True:
-                if x_position + output_size > width:
+                if x_position + output_image_size > width:
                     break
                 left = x_position
                 top = y_position
-                right = x_position + output_size
-                bottom = y_position + output_size
+                right = x_position + output_image_size
+                bottom = y_position + output_image_size
+
                 output_img = img.crop((left, top, right, bottom))
                 output_img_name = os.path.join(
                     output_dir, '%s_%s%s' % (filename, i, extension))
                 print('output:', output_img_name)
                 output_img.save(output_img_name)
-                x_position += output_size
+
+                x_position += output_image_size
                 i += 1
-            y_position += output_size
+            y_position += output_image_size
     return cut_picture
 
 
-def walk(root_dir, callback):
-    for fname in os.listdir(root_dir):
-        path = os.path.join(root_dir, fname)
-        if os.path.isfile(path) and not os.path.isdir(path):
-            callback(path)
-        if os.path.isdir(path):
-            walk(path, callback)
+def load_data(root_dir, output_image_size, output_dir):
+    walk(root_dir, curry_cut_picture(output_image_size, output_dir))
 
 
-def copy_image(father_path, path, times):
-    (filename, extension) = os.path.splitext(path)
+def copy_image(path, times):
+    father_dir = os.path.dirname(path)
+    (_, tempfilename) = os.path.split(path)
+    (filename, extension) = os.path.splitext(tempfilename)
 
     for i in range(0, times):
         new_filename = filename + '_' + str(i) + extension
-        new_file_path = os.path.join(father_path, new_filename)
+        new_file_path = os.path.join(father_dir, new_filename)
         shutil.copyfile(path, new_file_path)
 
 
 def oversampling(sample1_dir, sample2_dir):
-    """一次扫描的数据会远远小于二次扫描的，
-        这里采用 过采样 的方式
-    """
     sample1_content = os.listdir(sample1_dir)
     sample2_content = os.listdir(sample2_dir)
     sample1_content_len = len(sample1_content)
@@ -74,88 +87,64 @@ def oversampling(sample1_dir, sample2_dir):
     if sample1_content_len > sample2_content_len:
         times = int(sample1_content_len / sample2_content_len)
         if times >= 2:
-            for fname in sample1_content:
-                path = os.path.join(sample1_dir, fname)
-                copy_image(sample1_dir, path, times - 1)
+            for fname in sample2_content:
+                path = os_path_join(sample2_dir, fname)
+                copy_image(path, times - 1)
     else:
         times = int(sample2_content_len / sample1_content_len)
         if times >= 2:
-            for fname in sample2_content:
-                path = os.path.join(sample2_dir, fname)
-                copy_image(sample2_dir, path, times - 1)
+            for fname in sample1_content:
+                path = os_path_join(sample1_dir, fname)
+                copy_image(path, times - 1)
 
 
-def load_data(output_size):
-    current_path = os.path.dirname(__file__)
+def divide_to_train_validation_test(from_dir, train_dir, validation_dir, test_dir):
+    def move(path):
+        (_, tempfilename) = os.path.split(path)
+        num = random.randint(0, 9)
+        if num >= 0 and num <= 7:
+            new_path = os.path.join(train_dir, tempfilename)
+        elif num == 8:
+            new_path = os.path.join(validation_dir, tempfilename)
+        else:
+            new_path = os.path.join(test_dir, tempfilename)
+        shutil.copyfile(path, new_path)
+    walk(from_dir, move)
 
-    sample_dir = os.path.join(current_path, 'sample')
-    first_scan_sample = os.path.join(sample_dir, 'first-scan')
-    second_scan_sample = os.path.join(sample_dir, 'second-scan')
 
-    base_dir = os.path.join(current_path, 'base')
-    mkdir_if_not_exists(base_dir)
+if __name__ == "__main__":
+    image_size = 299
 
-    def generate_base_sample(sample_size):
-        sample_size_dir = os.path.join(base_dir, sample_size)
-        mkdir_if_not_exists(sample_size_dir)
-        first_scan_base = os.path.join(sample_size_dir, 'first-scan')
-        mkdir_if_not_exists(first_scan_base)
-        second_scan_base = os.path.join(sample_size_dir, 'second-scan')
-        mkdir_if_not_exists(second_scan_base)
-        return (first_scan_base, second_scan_base)
+    current_dir = os.path.dirname(__file__)
 
-    (first_scan_base, second_scan_base) = generate_base_sample(str(output_size))
-    if len(os.listdir(first_scan_base)) == 0:
-        walk(first_scan_sample, wrapper_cut_picture(
-            output_size, first_scan_base))
-        print(first_scan_base, 'over')
-    if len(os.listdir(second_scan_base)) == 0:
-        walk(second_scan_sample, wrapper_cut_picture(
-            output_size, second_scan_base))
-        print(second_scan_base, 'over')
+    sample_dir = os_path_join(current_dir, 'sample')
+    first_scan_sample = os_path_join(sample_dir, 'first-scan')
+    second_scan_sample = os_path_join(sample_dir, 'second-scan')
+
+    base_dir = os_path_join(current_dir, 'base' + '_' + str(image_size))
+    first_scan_base = os_path_join(base_dir, 'first-scan')
+    second_scan_base = os_path_join(base_dir, 'second-scan')
+
+    load_data(first_scan_sample, image_size, first_scan_base)
+    load_data(second_scan_sample, image_size, second_scan_base)
 
     oversampling(first_scan_base, second_scan_base)
 
-    train_dir = os.path.join(base_dir, 'train')
-    os.mkdir(train_dir)
-    validation_dir = os.path.join(base_dir, 'validation')
-    os.mkdir(validation_dir)
-    test_dir = os.path.join(base_dir, 'test')
-    os.mkdir(test_dir)
+    dataset_dir = os_path_join(current_dir, 'dataset')
+    train_dir = os_path_join(dataset_dir, 'train')
+    validation_dir = os_path_join(dataset_dir, 'validation')
+    test_dir = os_path_join(dataset_dir, 'test')
 
-    def mkdir_dir(father_dir, dirname):
-        new_dir = os.path.join(father_dir, dirname)
-        mkdir_if_not_exists(new_dir)
-        return new_dir
+    first_scan_dataset_train = os_path_join(train_dir, 'first-scan')
+    first_scan_dataset_validation = os_path_join(validation_dir, 'first-scan')
+    first_scan_dataset_test = os_path_join(test_dir, 'first-scan')
 
-    train_first_scan_dir = mkdir_dir(train_dir, 'first-scan')
-    train_second_scan_dir = mkdir_dir(train_dir, 'second-scan')
+    second_scan_dataset_train = os_path_join(train_dir, 'second-scan')
+    second_scan_dataset_validation = os_path_join(
+        validation_dir, 'second-scan')
+    second_scan_dataset_test = os_path_join(test_dir, 'second-scan')
 
-    validation_first_scan_dir = mkdir_dir(validation_dir, 'first-scan')
-    validation_second_scan_dir = mkdir_dir(validation_dir, 'second-scan')
-
-    test_first_scan_dir = mkdir_dir(test_dir, 'first-scan')
-    test_second_scan_dir = mkdir_dir(test_dir, 'second-scan')
-
-
-# load_data(224)
-load_data(299)
-
-# first_scan_224 = './base/224/first-scan'
-# second_scan_224 = './base/224/second-scan'
-first_scan_299 = './base/299/first-scan'
-second_scan_299 = './base/299/second-scan'
-
-
-# def print_len_listdir(dirname):
-#     print(len(os.listdir(dirname)))
-
-# print_len_listdir(first_scan_224)   # 87168
-# print_len_listdir(second_scan_224)  # 436150
-# print_len_listdir(first_scan_299)   # 48444
-# print_len_listdir(second_scan_299)  # 242450
-
-first_scan_299_len = len(os.listdir(first_scan_299))
-second_scan_299_len = len(os.listdir(second_scan_299))
-
-times = second_scan_299_len / first_scan_299_len
+    divide_to_train_validation_test(
+        first_scan_base, first_scan_dataset_train, first_scan_dataset_validation, first_scan_dataset_test)
+    divide_to_train_validation_test(second_scan_base, second_scan_dataset_train,
+                                    second_scan_dataset_validation, second_scan_dataset_test)
