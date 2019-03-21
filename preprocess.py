@@ -56,8 +56,6 @@ def load_data(output_size):
     second_scan_sample = os.path.join(sample_dir, 'second-scan')
 
     base_dir = os.path.join(current_path, 'base')
-    if os.path.exists(base_dir):
-        return
     mkdir_if_not_exists(base_dir)
     def sample(sample_size):
         sample_size_dir = os.path.join(base_dir, sample_size)
