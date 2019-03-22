@@ -148,3 +148,11 @@ if __name__ == "__main__":
         first_scan_base, first_scan_dataset_train, first_scan_dataset_validation, first_scan_dataset_test)
     divide_to_train_validation_test(second_scan_base, second_scan_dataset_train,
                                     second_scan_dataset_validation, second_scan_dataset_test)
+
+    print('train-frist-scan:', len(os.listdir(first_scan_dataset_train)))
+    print('validation-first-scan:', len(os.listdir(first_scan_dataset_validation)))
+    print('test-first-scan:', len(os.listdir(first_scan_dataset_test)))
+    print('train-second-scan:', len(os.listdir(second_scan_dataset_train)))
+    print('validation-second-scan:',
+          len(os.listdir(second_scan_dataset_validation)))
+    print('test-second-scan:', len(os.listdir(second_scan_dataset_test)))
