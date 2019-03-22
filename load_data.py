@@ -1,3 +1,10 @@
+"""
+准备数据，要输出 train, validation, test 文件夹
+阶段一：遍历原数据 sample 文件夹下的文件，将文件裁剪并放到 base 对应的文件夹下 => load_data
+阶段二：将 base 文件夹下的数据进行过采样 => oversampling
+阶段三：将数据分成 train, validation, test 三类 => divide_to_train_validation_test
+"""
+
 import os
 import shutil
 from PIL import Image
@@ -5,12 +12,6 @@ from PIL import Image
 import random
 
 Image.MAX_IMAGE_PIXELS = 1000000000
-
-"""
-阶段一：遍历原数据 sample 文件夹下的文件，将文件裁剪并放到 base 对应的文件夹下 => load_data
-阶段二：将 base 文件夹下的数据进行过采样 => oversampling
-阶段三：将数据分成 train, validation, test 三类 => divide_to_train_validation_test
-"""
 
 
 def os_path_join(father_dir, filename):
@@ -63,7 +64,7 @@ def curry_cut_picture(output_image_size, output_dir):
     return cut_picture
 
 
-def load_data(root_dir, output_image_size, output_dir):
+def load(root_dir, output_image_size, output_dir):
     walk(root_dir, curry_cut_picture(output_image_size, output_dir))
 
 
@@ -112,9 +113,7 @@ def divide_to_train_validation_test(from_dir, train_dir, validation_dir, test_di
     walk(from_dir, move)
 
 
-if __name__ == "__main__":
-    image_size = 299
-
+def load_data(image_size):
     current_dir = os.path.dirname(__file__)
 
     sample_dir = os_path_join(current_dir, 'sample')
@@ -125,34 +124,35 @@ if __name__ == "__main__":
     first_scan_base = os_path_join(base_dir, 'first-scan')
     second_scan_base = os_path_join(base_dir, 'second-scan')
 
-    load_data(first_scan_sample, image_size, first_scan_base)
-    load_data(second_scan_sample, image_size, second_scan_base)
+    load(first_scan_sample, image_size, first_scan_base)
+    load(second_scan_sample, image_size, second_scan_base)
 
     oversampling(first_scan_base, second_scan_base)
 
-    dataset_dir = os_path_join(current_dir, 'dataset')
-    train_dir = os_path_join(dataset_dir, 'train')
-    validation_dir = os_path_join(dataset_dir, 'validation')
-    test_dir = os_path_join(dataset_dir, 'test')
+    dataset_dir = os.path.join(current_dir, 'dataset')
+    train_dir = os.path.join(dataset_dir, 'train')
+    validation_dir = os.path.join(dataset_dir, 'validation')
+    test_dir = os.path.join(dataset_dir, 'test')
 
-    first_scan_dataset_train = os_path_join(train_dir, 'first-scan')
-    first_scan_dataset_validation = os_path_join(validation_dir, 'first-scan')
-    first_scan_dataset_test = os_path_join(test_dir, 'first-scan')
+    if not os.path.exists(dataset_dir):
+        os.mkdir(dataset_dir)
+        os.mkdir(train_dir)
+        os.mkdir(validation_dir)
+        os.mkdir(test_dir)
 
-    second_scan_dataset_train = os_path_join(train_dir, 'second-scan')
-    second_scan_dataset_validation = os_path_join(
-        validation_dir, 'second-scan')
-    second_scan_dataset_test = os_path_join(test_dir, 'second-scan')
+        first_scan_dataset_train = os_path_join(train_dir, 'first-scan')
+        first_scan_dataset_validation = os_path_join(
+            validation_dir, 'first-scan')
+        first_scan_dataset_test = os_path_join(test_dir, 'first-scan')
 
-    divide_to_train_validation_test(
-        first_scan_base, first_scan_dataset_train, first_scan_dataset_validation, first_scan_dataset_test)
-    divide_to_train_validation_test(second_scan_base, second_scan_dataset_train,
-                                    second_scan_dataset_validation, second_scan_dataset_test)
+        second_scan_dataset_train = os_path_join(train_dir, 'second-scan')
+        second_scan_dataset_validation = os_path_join(
+            validation_dir, 'second-scan')
+        second_scan_dataset_test = os_path_join(test_dir, 'second-scan')
 
-    print('train-frist-scan:', len(os.listdir(first_scan_dataset_train)))
-    print('validation-first-scan:', len(os.listdir(first_scan_dataset_validation)))
-    print('test-first-scan:', len(os.listdir(first_scan_dataset_test)))
-    print('train-second-scan:', len(os.listdir(second_scan_dataset_train)))
-    print('validation-second-scan:',
-          len(os.listdir(second_scan_dataset_validation)))
-    print('test-second-scan:', len(os.listdir(second_scan_dataset_test)))
+        divide_to_train_validation_test(
+            first_scan_base, first_scan_dataset_train, first_scan_dataset_validation, first_scan_dataset_test)
+        divide_to_train_validation_test(second_scan_base, second_scan_dataset_train,
+                                        second_scan_dataset_validation, second_scan_dataset_test)
+
+    return (dataset_dir, train_dir, validation_dir, test_dir)
