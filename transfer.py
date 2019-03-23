@@ -1,10 +1,10 @@
-from keras.models import *
-from keras.layers import *
+from keras.models import Model
+from keras.layers import Input, Lambda, GlobalAveragePooling2D
 from keras.applications import inception_v3
 from keras.applications import xception
 from keras.applications.inception_v3 import InceptionV3
 from keras.applications.xception import Xception
-from keras.preprocessing.image import *
+from keras.preprocessing.image import ImageDataGenerator
 
 from load_data import load_data
 
