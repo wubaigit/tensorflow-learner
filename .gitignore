@@ -1,5 +1,8 @@
 conference
 sample
 # sample/*
-base*
+base_224
+base_299
 dataset
+PetImages
+template

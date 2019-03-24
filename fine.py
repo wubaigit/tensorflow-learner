@@ -19,7 +19,7 @@ from keras.optimizers import SGD
 
 IM_WIDTH, IM_HEIGHT = 299, 299  # fixed size for InceptionV3
 NB_EPOCHS = 3
-BAT_SIZE = 32
+BAT_SIZE = 20
 FC_SIZE = 1024
 NB_IV3_LAYERS_TO_FREEZE = 172
 
@@ -110,12 +110,14 @@ def train(args):
         args.train_dir,
         target_size=(IM_WIDTH, IM_HEIGHT),
         batch_size=batch_size,
+        class_mode='categorical'
     )
 
     validation_generator = test_datagen.flow_from_directory(
         args.val_dir,
         target_size=(IM_WIDTH, IM_HEIGHT),
         batch_size=batch_size,
+        class_mode='categorical'
     )
 
     # setup model

@@ -100,6 +100,9 @@ def oversampling(sample1_dir, sample2_dir):
 
 
 def divide_to_train_validation_test(from_dir, train_dir, validation_dir, test_dir):
+    """
+    训练集，验证集，测试集 划分比例暂不明确
+    """
     def move(path):
         (_, tempfilename) = os.path.split(path)
         num = random.randint(0, 9)
@@ -129,7 +132,7 @@ def load_data(image_size):
 
     oversampling(first_scan_base, second_scan_base)
 
-    dataset_dir = os.path.join(current_dir, 'dataset')
+    dataset_dir = os.path.join(current_dir, 'dataset' + '_' + str(image_size))
     train_dir = os.path.join(dataset_dir, 'train')
     validation_dir = os.path.join(dataset_dir, 'validation')
     test_dir = os.path.join(dataset_dir, 'test')
@@ -156,3 +159,7 @@ def load_data(image_size):
                                         second_scan_dataset_validation, second_scan_dataset_test)
 
     return (dataset_dir, train_dir, validation_dir, test_dir)
+
+if __name__ == "__main__":
+    # load_data(224)
+    load_data(299)
