@@ -32,7 +32,7 @@ def curry_cut_picture(output_image_size, output_dir):
     def cut_picture(path):
         print('input:', path)
         (_, tempfilename) = os.path.split(path)
-        (filename, extension) = os.path.splitext(tempfilename)
+        (filename, _) = os.path.splitext(tempfilename)
 
         img = Image.open(path)
         width = img.size[0]
@@ -54,7 +54,7 @@ def curry_cut_picture(output_image_size, output_dir):
 
                 output_img = img.crop((left, top, right, bottom))
                 output_img_name = os.path.join(
-                    output_dir, '%s_%s%s' % (filename, i, extension))
+                    output_dir, '%s_%s%s' % (filename, i, '.png'))
                 print('output:', output_img_name)
                 output_img.save(output_img_name)
 

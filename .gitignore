@@ -3,6 +3,6 @@ sample
 # sample/*
 base_224
 base_299
-dataset
+dataset*
 PetImages
 template
