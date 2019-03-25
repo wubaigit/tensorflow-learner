@@ -28,7 +28,7 @@ def get_nb_files(directory):
     if not os.path.exists(directory):
         return 0
     cnt = 0
-    for r, dirs, files in os.walk(directory):
+    for r, dirs, _ in os.walk(directory):
         for dr in dirs:
             cnt += len(glob.glob(os.path.join(r, dr + "/*")))
     return cnt
@@ -127,7 +127,8 @@ def train(args):
     # transfer learning
     setup_to_transfer_learn(model, base_model)
 
-    history_tl = model.fit_generator(
+    # history_tl = 
+    model.fit_generator(
         train_generator,
         epochs=nb_epoch,
         steps_per_epoch=nb_train_samples,
@@ -138,7 +139,8 @@ def train(args):
     # fine-tuning
     setup_to_finetune(model)
 
-    history_ft = model.fit_generator(
+    # history_ft = 
+    model.fit_generator(
         train_generator,
         steps_per_epoch=nb_train_samples,
         epochs=nb_epoch,
