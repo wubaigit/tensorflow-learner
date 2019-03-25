@@ -1,13 +1,8 @@
-"""
-keras1 => keras2
-尝试运行
-"""
-
 import os
 import sys
 import glob
 import argparse
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 from keras import __version__
 from keras.applications.inception_v3 import InceptionV3, preprocess_input
@@ -16,10 +11,14 @@ from keras.layers import Dense, GlobalAveragePooling2D
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import SGD
 
+from keras import backend
+
+backend.tensorflow_backend._get_available_gpus()
+
 
 IM_WIDTH, IM_HEIGHT = 299, 299  # fixed size for InceptionV3
 NB_EPOCHS = 3
-BAT_SIZE = 20
+BAT_SIZE = 49
 FC_SIZE = 1024
 NB_IV3_LAYERS_TO_FREEZE = 172
 
@@ -88,22 +87,22 @@ def train(args):
 
     # data prep
     train_datagen = ImageDataGenerator(
-        preprocessing_function=preprocess_input,
-        rotation_range=30,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True
+        # preprocessing_function=preprocess_input,
+        # rotation_range=30,
+        # width_shift_range=0.2,
+        # height_shift_range=0.2,
+        # shear_range=0.2,
+        # zoom_range=0.2,
+        # horizontal_flip=True
     )
     test_datagen = ImageDataGenerator(
-        preprocessing_function=preprocess_input,
-        rotation_range=30,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True
+        # preprocessing_function=preprocess_input,
+        # rotation_range=30,
+        # width_shift_range=0.2,
+        # height_shift_range=0.2,
+        # shear_range=0.2,
+        # zoom_range=0.2,
+        # horizontal_flip=True
     )
 
     train_generator = train_datagen.flow_from_directory(
@@ -149,26 +148,26 @@ def train(args):
 
     model.save(args.output_model_file)
 
-    if args.plot:
-        plot_training(history_ft)
+    # if args.plot:
+    #     plot_training(history_ft)
 
 
-def plot_training(history):
-    acc = history.history['acc']
-    val_acc = history.history['val_acc']
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
-    epochs = range(len(acc))
+# def plot_training(history):
+#     acc = history.history['acc']
+#     val_acc = history.history['val_acc']
+#     loss = history.history['loss']
+#     val_loss = history.history['val_loss']
+#     epochs = range(len(acc))
 
-    plt.plot(epochs, acc, 'r.')
-    plt.plot(epochs, val_acc, 'r')
-    plt.title('Training and validation accuracy')
+#     plt.plot(epochs, acc, 'r.')
+#     plt.plot(epochs, val_acc, 'r')
+#     plt.title('Training and validation accuracy')
 
-    plt.figure()
-    plt.plot(epochs, loss, 'r.')
-    plt.plot(epochs, val_loss, 'r-')
-    plt.title('Training and validation loss')
-    plt.show()
+#     plt.figure()
+#     plt.plot(epochs, loss, 'r.')
+#     plt.plot(epochs, val_loss, 'r-')
+#     plt.title('Training and validation loss')
+#     plt.show()
 
 
 if __name__ == "__main__":
@@ -178,7 +177,7 @@ if __name__ == "__main__":
     a.add_argument("--nb_epoch", default=NB_EPOCHS)
     a.add_argument("--batch_size", default=BAT_SIZE)
     a.add_argument("--output_model_file", default="inceptionv3-ft.model")
-    a.add_argument("--plot", action="store_true")
+    # a.add_argument("--plot", action="store_true")
 
     args = a.parse_args()
     if args.train_dir is None or args.val_dir is None:
