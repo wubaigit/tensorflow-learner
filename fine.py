@@ -127,24 +127,24 @@ def train(args):
     # transfer learning
     setup_to_transfer_learn(model, base_model)
 
-    history_tl = model.fit_generator(
-        train_generator,
-        epochs=nb_epoch,
-        steps_per_epoch=nb_train_samples,
-        validation_data=validation_generator,
-        validation_steps=nb_val_samples,
-        class_weight='auto')
+    # history_tl = model.fit_generator(
+    #     train_generator,
+    #     epochs=nb_epoch,
+    #     steps_per_epoch=nb_train_samples,
+    #     validation_data=validation_generator,
+    #     validation_steps=nb_val_samples,
+    #     class_weight='auto')
 
     # fine-tuning
     setup_to_finetune(model)
 
-    history_ft = model.fit_generator(
-        train_generator,
-        steps_per_epoch=nb_train_samples,
-        epochs=nb_epoch,
-        validation_data=validation_generator,
-        validation_steps=nb_val_samples,
-        class_weight='auto')
+    # history_ft = model.fit_generator(
+    #     train_generator,
+    #     steps_per_epoch=nb_train_samples,
+    #     epochs=nb_epoch,
+    #     validation_data=validation_generator,
+    #     validation_steps=nb_val_samples,
+    #     class_weight='auto')
 
     model.save(args.output_model_file)
 
