@@ -13,6 +13,7 @@ def walk(path, callback):
 
 def divide_to_train_validation_test(from_dir, train_dir, validation_dir, test_dir):
     """
+    取 1/8 的数据
     训练集，验证集，测试集 6:2:2
     """
     def move(path):
