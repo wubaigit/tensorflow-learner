@@ -25,6 +25,7 @@ def divide_to_train_validation_test(from_dir, train_dir, validation_dir, test_di
                 new_path = os.path.join(validation_dir, tempfilename)
             else:
                 new_path = os.path.join(test_dir, tempfilename)
+            print('copy:', new_path)
             shutil.copyfile(path, new_path)
     walk(from_dir, move)
 
