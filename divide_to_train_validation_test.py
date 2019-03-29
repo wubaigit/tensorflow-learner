@@ -1,8 +1,6 @@
 import os
 import random
-
-random.seed(2017)
-
+import shutil
 
 def walk(path, callback):
     for fpath, _, file_list in os.walk(path):
@@ -33,10 +31,12 @@ def divide_to_train_validation_test(from_dir, train_dir, validation_dir, test_di
 
 def os_path_join_and_mk(father, dirname):
     new_path = os.path.join(father, dirname)
-    if os.path.exists(new_path):
+    if not os.path.exists(new_path):
         os.mkdir(new_path)
     return new_path
 
+
+random.seed(2017)
 
 image_size = 299
 current_dir = os.path.dirname(__file__)
