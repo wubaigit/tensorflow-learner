@@ -78,7 +78,7 @@ model = Model(inputs=base_model.input, outputs=top_model(base_model.output))
 
 # set the first 25 layers (up to the last conv block)
 # to non-trainable (weights will not be updated)
-for layer in model.layers[:25]:
+for layer in model.layers[:15]:
     layer.trainable = False
 
 # compile the model with a SGD/momentum optimizer
