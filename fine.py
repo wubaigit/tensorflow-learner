@@ -18,7 +18,7 @@ backend.tensorflow_backend._get_available_gpus()
 
 IM_WIDTH, IM_HEIGHT = 299, 299  # fixed size for InceptionV3
 NB_EPOCHS = 3
-BAT_SIZE = 49
+BAT_SIZE = 20
 FC_SIZE = 1024
 NB_IV3_LAYERS_TO_FREEZE = 172
 
@@ -127,8 +127,7 @@ def train(args):
     # transfer learning
     setup_to_transfer_learn(model, base_model)
 
-    # history_tl = 
-    model.fit_generator(
+    history_tl = model.fit_generator(
         train_generator,
         epochs=nb_epoch,
         steps_per_epoch=nb_train_samples,
@@ -139,8 +138,7 @@ def train(args):
     # fine-tuning
     setup_to_finetune(model)
 
-    # history_ft = 
-    model.fit_generator(
+    history_ft = model.fit_generator(
         train_generator,
         steps_per_epoch=nb_train_samples,
         epochs=nb_epoch,
@@ -149,6 +147,9 @@ def train(args):
         class_weight='auto')
 
     model.save(args.output_model_file)
+
+    print('tl:', history_tl.history)
+    print('ft:', history_ft.history)
 
     # if args.plot:
     #     plot_training(history_ft)
